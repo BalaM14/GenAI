@@ -196,3 +196,6 @@ Data/*
 docs/*
 Resources/*
 genai_venv/*
+Proj-1_Text_Summarizer/*
+!Proj-1_Text_Summarizer/*.ipynb
+.dvc

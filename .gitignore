@@ -192,3 +192,14 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+
+
+GenAI_Projects/Proj-1_Text_Summarizer/*
+!GenAI_Projects/Proj-1_Text_Summarizer/Text_Summarizer_Project.ipynb
+
+**/*venv/
+**/.env
+
+GenAI_Topics/Resources/
+GenAI_Topics/Data/

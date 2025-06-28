@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>📁 Upload PDFs for Chatbot</h2>
+
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="pdfs" multiple accept=".pdf">
+        <button type="submit">Upload PDFs</button>
+    </form>
+
+    <h3>📂 Pending PDFs (Not Inserted Yet)</h3>
+    {% if pdfs %}
+        <ul>
+            {% for pdf in pdfs %}
+            <li>{{ pdf }}</li>
+            {% endfor %}
+        </ul>
+        <form method="POST" action="/process">
+            <button type="submit">📌 Embed & Insert to Vector DB</button>
+        </form>
+    {% else %}
+        <p>No new PDFs to embed.</p>
+    {% endif %}
+
+    <h3>✅ Already Inserted PDFs</h3>
+    {% if inserted %}
+        <ul>
+            {% for pdf in inserted %}
+            <li>{{ pdf }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No processed PDFs yet.</p>
+    {% endif %}
+
+    <form method="GET" action="{{ url_for('ask') }}">
+        <button type="submit">💬 Ask a Question</button>
+    </form>
+</div>
+</body>
+</html>

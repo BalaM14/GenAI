@@ -7,6 +7,8 @@ from langchain.prompts import PromptTemplate
 import os
 import openai
 from dotenv import load_dotenv
+import glob
+import shutil
 
 load_dotenv()
 
@@ -15,7 +17,6 @@ os.environ['PINECONE_API_KEY'] = os.getenv("PINECONE_API_KEY")
 
 embed = OpenAIEmbeddings()
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
@@ -24,14 +25,15 @@ def load_data(dir_path):
     data = loader.load()
     return data
 
+
 def split_chunks(data):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = text_splitter.split_documents(data)
     texts = [doc.page_content for doc in chunks]
     return chunks, texts
 
-def embed_vectors(texts,chunks,embed):
-    
+
+def embed_vectors(texts,chunks,embed):   
     embeddings = embed.embed_documents(texts)
     vectors = [
             {
@@ -46,6 +48,7 @@ def embed_vectors(texts,chunks,embed):
             for i, vector in enumerate(embeddings)
             ]
     return vectors
+
 
 def format_vectors(embedded_vectors):
     pc_vectors = [
@@ -63,12 +66,16 @@ def format_vectors(embedded_vectors):
 
 
 def insert_vectors(pc_index, pc_vectors):
-    try:
-        pc_index.delete(delete_all=True)
-    except Exception as e:
-        pass
     pc_index.upsert(pc_vectors)
     return True
+
+
+def move_uploaded_pdfs(source_dir="Data", target_dir="Data/uploaded"):
+    os.makedirs(target_dir, exist_ok=True)
+    for file in os.listdir(source_dir):
+        if file.endswith(".pdf"):
+            shutil.move(os.path.join(source_dir, file), os.path.join(target_dir, file))
+
 
 def inferrence(index_name,embed,user_query):
     inference_index = pc.Index(index_name)
@@ -79,8 +86,8 @@ def inferrence(index_name,embed,user_query):
         top_k=3,
         include_metadata=True
     )
-
     return response
+
 
 def llm_response(final_response,user_query):
     prompt = f"""
@@ -98,9 +105,7 @@ def llm_response(final_response,user_query):
                 temperature=0.5,
                 max_tokens=300,
             )
-    
     return llm_response_msg.choices[0].message.content
-
 
 
 if __name__ == "__main__":
@@ -117,6 +122,7 @@ if __name__ == "__main__":
     pc_index = pc.Index(index_name)
     vectors_inserted = insert_vectors(pc_index, pc_vectors)
     print("Inserted the vectors to Pinecone DB")
+    move_uploaded_pdfs()
     user_query = input("Enter the query?")
     response = inferrence(index_name,embed,user_query)
     print(user_query)
@@ -129,4 +135,3 @@ if __name__ == "__main__":
 
     answer = llm_response(final_response,user_query)
     print(f"\n\nLLM Response: \n{answer}")
-    

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ask a Question</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>🤖 Ask a Question About Your Documents</h2>
+        <form method="POST">
+            <input type="text" name="query" placeholder="Enter your question..." required>
+            <button type="submit">Get Answer</button>
+        </form>
+
+        {% if answer %}
+            <div class="response-box">
+                <strong>Answer:</strong>
+                <p>{{ answer }}</p>
+            </div>
+        {% endif %}
+
+        <footer>
+            <p><a href="/">⬅ Back to Upload</a></p>
+        </footer>
+    </div>
+</body>
+</html>

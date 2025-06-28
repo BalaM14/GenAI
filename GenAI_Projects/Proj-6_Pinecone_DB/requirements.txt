@@ -5,3 +5,4 @@ tiktoken
 langchain_community
 pinecone
 python-dotenv
+werkzeug
